@@ -1,17 +1,20 @@
 #!/bin/bash
-az group create --name jenkins-get-started-rg --location eastus
 
+{ 
+    az group create 
+    --name gitlab-lab-rg 
+    --location eastus
 
-# vm created with ssh key required
-az vm create \                                                                                                                                                             [21:24:29]
---resource-group jenkins-get-started-rg \
---name jenkins-get-started-vm \
---image UbuntuLTS \
---public-ip-sku Standard \
---custom-data cloud-init-jenkins.txt \
---admin-username azureroot \
---ssh-key-values <path-to-ssh-file>
-
+    # vm created with ssh key required
+    az vm create \                                                                                                                                                             [21:24:29]
+    --resource-group gitlab-lab-rg \
+    --name gitlab-lab-vm \
+    --image UbuntuLTS \
+    --public-ip-sku Standard \
+    --custom-data cloud-init-jenkins.txt \
+    --admin-username azureroot \
+    --ssh-key-values @<path-to-file>
+}
 
 # Oepn all port from my local IP
 LOCAL_IP=$(curl -sL ifconfig.me) \ 
