@@ -1,25 +1,38 @@
 #!/bin/bash
-
 az group create --name jenkins-get-started-rg --location eastus
 
-az vm create \
+
+# vm created with ssh key required
+az vm create \                                                                                                                                                             [21:24:29]
 --resource-group jenkins-get-started-rg \
 --name jenkins-get-started-vm \
 --image UbuntuLTS \
 --public-ip-sku Standard \
---custom-data cloud-init-jenkins.txt
+--custom-data cloud-init-jenkins.txt \
+--admin-username azureroot \
+--ssh-key-values <path-to-ssh-file>
 
-# Change admin
-echo az vm user update --username azureroot --ssh-key-value "$(< <path-to-ssh-file>)" --name vault-01-vm --resource-group vault-01-rg
 
 # Oepn all port from my local IP
-LOCAL_IP=$(curl -sL ifconfig.me) && az network nsg rule create -g vault-01-rg --nsg-name allow-all-port-traffic-from-home-ip -n vault-01-rg --priority 1100 --source-address-prefixes ${LOCAL_IP} --source-port-ranges '*' --destination-address-prefixes '*' --destination-port-ranges '*' --access Allow --protocol Tcp --description "Allow all ports traffic from home ip"
+LOCAL_IP=$(curl -sL ifconfig.me) \ 
+&& az network nsg rule create \
+-g jenkins-get-started-rg \
+--nsg-name jenkins-get-started-vmNSG \
+-n allow-all-inbound-traffic-from-local-ip \
+--priority 1100 \
+--source-address-prefixes ${LOCAL_IP} \
+--source-port-ranges '*' \
+--destination-address-prefixes '*' \
+--destination-port-ranges '*' \
+--access Allow \
+--protocol Tcp \
+--description "Allow all inbound traffic from the local IP."
 
-
+# Get VM Details
 az vm list -d -o table --query "[?name=='jenkins-get-started-vm']"
 
 az vm show \
 --resource-group jenkins-get-started-rg \
 --name jenkins-get-started-vm -d \
---query [publicIps] \
+--query '[publicIps]' \
 --output tsv
