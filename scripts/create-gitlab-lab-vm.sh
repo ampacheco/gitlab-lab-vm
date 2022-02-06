@@ -16,6 +16,8 @@
     --ssh-key-values @<path-to-file>
 }
 
+.
+
 # Oepn all port from my local IP
 LOCAL_IP=$(curl -sL ifconfig.me) \ 
 && az network nsg rule create \
